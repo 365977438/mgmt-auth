@@ -1,0 +1,93 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	 xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+ 	<http pattern="/assets/**" security="none"/>
+	
+	<http auto-config="false" pattern="/**" use-expressions="true" entry-point-ref="casEntryPoint"
+		>
+		<anonymous enabled="false" />
+		
+		<custom-filter before="LOGOUT_FILTER" ref="requestSingleLogoutFilter"/>
+		<custom-filter before="CAS_FILTER" ref="singleLogoutFilter"/>
+		<custom-filter position="CAS_FILTER" ref="casFilter" />
+		<custom-filter after="FILTER_SECURITY_INTERCEPTOR" ref="authorizationFilter" />	
+	</http>
+ 	
+ 	<!-- This filter handles a Single Logout Request from the CAS Server -->
+	<beans:bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
+	
+	<!-- This filter redirects to the CAS Server to signal Single Logout should be performed -->
+	<beans:bean id="requestSingleLogoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+	  <!--Logout success url, to be processed by cas server, redirect back to index.do -->
+	  <beans:constructor-arg value="${cas.logoutUrl}?service=${cas.localContext}/index.do"/>
+	  <beans:constructor-arg>
+	    <beans:bean class= "org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+	  </beans:constructor-arg>
+	  <beans:property name="filterProcessesUrl" value="${cas.local.logoutProcessUrl}"/>
+	</beans:bean>
+
+ 	<beans:bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties"
+        p:service="${cas.local.service}"
+        p:sendRenew="false"/>
+        
+ 	<beans:bean id="casEntryPoint" class="com.yoju360.mgmt.security.CasAuthenticationEntryPoint"
+        p:loginUrl="${cas.loginUrl}"
+        p:serviceProperties-ref="serviceProperties"/>
+        
+	<beans:bean id="casFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter"
+		p:authenticationManager-ref="casAuthenticationManager"
+		p:filterProcessesUrl="${cas.local.authProcessUrl}">
+		<beans:property name="authenticationSuccessHandler">
+			<beans:bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" />
+		</beans:property>
+		<beans:property name="authenticationFailureHandler">
+			<beans:bean
+				class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+				<beans:constructor-arg index="0" value="${cas.loginUrl}" /><!-- TODO -->
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
+  
+ 	<beans:bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider"
+        p:key="my_password_for_this_auth_provider_only"
+        p:serviceProperties-ref="serviceProperties"
+       > <!--  p:userDetailsService-ref="userDetailsService" -->
+	    <beans:property name="ticketValidator">
+	      <beans:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+	        <beans:constructor-arg index="0" value="${cas.ticket.validateUrlPrefix}"/>
+	      </beans:bean>
+	    </beans:property>
+	    <beans:property name="authenticationUserDetailsService" ref="userDetailsService"/>
+	</beans:bean>
+  
+ 	<beans:bean id="authorizationFilter"
+		class="com.yoju360.mgmt.security.FilterSecurityInterceptor">
+		<!-- beans:property name="rejectPublicInvocations" value="true"/-->
+		<beans:property name="authenticationManager" ref="casAuthenticationManager" />
+		<beans:property name="accessDecisionManager" ref="accessDecisionManager" />
+		<beans:property name="securityMetadataSource" ref="securityMetadataSource" />
+	</beans:bean>
+	
+	<authentication-manager alias="casAuthenticationManager">
+    	<authentication-provider ref="casAuthenticationProvider"/>
+  	</authentication-manager>
+   
+    <beans:bean id="userDetailsService" class="com.yoju360.mgmt.security.service.CasUserDetailsService"/>
+    
+	<beans:bean id="accessDecisionManager" class="com.yoju360.mgmt.security.AccessDecisionManager"/>
+ 	
+ 	<beans:bean id="securityMetadataSource" class="com.yoju360.mgmt.security.CasInvocationSecurityMetadataSource">
+		<beans:property name="additionalConfigAttributes">
+			<beans:map>
+				<beans:entry key="/**/*.do" value="isAuthenticated()"/>
+			</beans:map>
+		</beans:property>
+	</beans:bean>
+ 	
+</beans:beans>
