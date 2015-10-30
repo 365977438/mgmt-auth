@@ -1,0 +1,47 @@
+.nav-active{
+	  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.nav-list li a{
+  padding-left: 20px;
+}
+
+.navbar-nav li a{
+	padding-left:40px;padding-right:40px;text-align: center;
+}
+
+#resultLoading {
+	width:100%;
+	height:100%;
+	position:fixed;
+	z-index:10000000;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	margin:auto;
+}
+
+#resultLoading .bg {
+	background:#000000;
+	opacity:0;
+	width:100%;
+	height:100%;
+	position:absolute;
+	top:0;
+}
+
+#resultLoading > div:first-child {
+	width: 250px;
+	height:75px;
+	text-align: center;
+	position: fixed;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	margin:auto;
+	font-size:16px;
+	z-index:10;
+	color:#438eb9;
+}
