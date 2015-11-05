@@ -21,7 +21,7 @@ jQuery(document).ajaxStart(function () {
 	} else if (xhr.status == 403) {
 		sys.alertInfo('对不起，您缺少相应权限', 'warning');
 	} else {
-		sys.alertInfo('对不起，出现错误: ' + xhr.status + ' ' + error, 'danger');
+		sys.alertInfo('对不起，出现错误，请刷新页面后重试: ' + xhr.status + ' ' + error, 'danger');
 	}
 	console.error(event, xhr, error);
 });
@@ -405,8 +405,10 @@ sys.backInTab = function(id) {
 		
 		$('#' + id + '_content').load(urlName.url);
 		$('#tabs a[data-toggle="' + id + '"]').attr('href', '#' + id + '_content').html(urlName.name + '<button class="close" type="button" title="关闭页面">×</button>');
-	} else
+	} else {
 		console.error("tab " + id + " is not found.");
+		sys.alertInfo('对不起，登录可能超时，请刷新页面后重试', 'warning');
+	}
 };
 
 /* 在tabs容器添加新的tab */

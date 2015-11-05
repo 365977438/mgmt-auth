@@ -4,7 +4,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 		<meta charset="utf-8" />
-		<title>优居-管理后台</title>
+		<title>优居-<#if currentSystem ??>${currentSystem.title}<#else>管理后台</#if></title>
 		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 		<meta http-equiv="Pragma" content="no-cache" />
 		<meta http-equiv="Expires" content="0" />
@@ -303,7 +303,7 @@
 					</#list>
 				</ul><!-- /.nav-list -->
 				<#else>
-					缺少相关权限
+					&nbsp;&nbsp;&nbsp;&nbsp;缺少相关权限
 				</#if>
 				<!-- #section:basics/sidebar.layout.minimize -->
 				<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
@@ -357,7 +357,7 @@
 					<!-- #section:basics/footer -->
 					<div class="footer-content">
 						<span class="bigger-120">
-							<span class="blue bolder">&copy; 2015 深圳前海优品优居网络科技有限公司</span>
+							<span class="blue">&copy; 2015 深圳前海优品优居网络科技有限公司</span>
 						</span>
 					</div>
 
