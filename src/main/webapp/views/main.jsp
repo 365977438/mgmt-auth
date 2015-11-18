@@ -235,7 +235,7 @@
 								${sys.title}
 							</a>
 							<#else>
-							<a href="javascript:void(0);" onclick="javascript:sys.changeSystem('${sys.systemName}', '${(sys.url)!}');">
+							<a href="${(sys.url)!}">
 								${sys.title}
 							</a>
 							</#if>
