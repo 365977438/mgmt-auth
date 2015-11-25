@@ -121,7 +121,9 @@
 					// add id attribute
 					if('additionalParameters' in value && 'id' in value.additionalParameters) {
 						var idVal = value.additionalParameters.id;
+						var parentIdVal = value.additionalParameters.parentId;
 						$entity.attr('id', self.idPrefix + '_' + idVal);
+						$entity.attr('parentId', self.idPrefix + '_' + parentIdVal);//写入父节点ID
 						$entity.attr('aria-labelledby', idVal + '-label');
 						$entity.find('.tree-branch-name > .tree-label').attr('id', idVal + '-label');
 					}
@@ -189,15 +191,22 @@
 		},
 
 		selectItem: function (el) {
+			var parentid = "";//父节点ID
 			if(this.options['selectable'] == false) return;//ACE
-			
+			 parentid = $(el).attr("parentid");
 			var $el = $(el);
 			var selData;
 			if ($el.hasClass('tree-branch-header')) {
 				var $clickedBranch = $el.closest('.tree-branch');
+				parentid = $clickedBranch.attr("parentid");
 				selData = $clickedBranch.data();
 			} else
 				selData = $el.data();
+			
+			//联动效果启动，下级节点存在勾选节点，不予操作
+			if(this.options.linkage&&$el.hasClass('tree-branch-header')&&$el.hasClass('tree-selected')&&$el.next().find("li").is(".tree-selected")){
+				return;
+			}
 			var $all = this.$element.find('.tree-selected');
 			var data = [];
 			var $icon = $el.find('.icon-item');
@@ -210,7 +219,6 @@
 					}
 				});
 			} else if ($all[0] !== $el[0]) {
-				//
 				$all.removeClass('tree-selected')
 					.find('i').removeClass(this.options['selected-icon']).addClass(this.options['unselected-icon']);//ACE
 				data.push(selData);
@@ -243,6 +251,11 @@
 				item: $el,
 				eventType: eventType
 			});
+			var $parentSelect =$($("#"+parentid).find("div").first());//上级节点
+			//联动效果启动，则子节点勾选状态变化，父节点勾选状态联动
+			if(this.options.linkage&&parentid!=null&&parentid.split("_")[2]!="0"&&!$el.nextAll().is(".tree-selected")&&($parentSelect.is(".tree-selected")!=$el.is(".tree-selected"))){
+				this.selectItem($parentSelect);//回调上级节点
+			}
 		},
 
 		openFolder: function (el) {
@@ -564,7 +577,8 @@
 		dataSource: function(options, callback){},
 		multiSelect: false,
 		cacheItems: true,
-		folderSelect: false//ACE
+		folderSelect: false,//ACE
+		linkage : false//节点联动
 	};
 
 	$.fn.tree.Constructor = Tree;
