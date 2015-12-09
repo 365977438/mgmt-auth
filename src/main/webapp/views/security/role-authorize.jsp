@@ -80,12 +80,12 @@
 			'multiSelect': true,
 			'selectable': true,
 			'cacheItems': true,
+			'linkage': true,//开启节点联动
 			'open-icon' : 'ace-icon tree-minus',
 			'close-icon' : 'ace-icon tree-plus',
 			'selected-icon' : 'ace-icon fa fa-check',
 			'unselected-icon' : 'ace-icon fa fa-times'
 		});
-		
 		$('#role_authorize-tree').one('loaded.fu.tree', function (event, data) {
 			$('#role_authorize-tree').tree('discloseAll');
 		});
